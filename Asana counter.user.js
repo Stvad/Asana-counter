@@ -9,6 +9,9 @@
 // @require     https://craig.global.ssl.fastly.net/js/mousetrap/mousetrap.min.js
 // ==/UserScript==
 
+//todo - new entries
+//todo - loading of additional entries
+
 var runningSum = 0;
 var selectedRows = {};
 (function() {
@@ -58,8 +61,34 @@ var selectedRows = {};
             attributes: true
         });
     });
+    
+    var gridObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            console.log(mutation);
+            mutation.addedNodes.forEach(function (row) {
+                observer.observe(row,  {
+                    attributes: true
+                });
+            });
+        });
+    });
+    
+    gridObserver.observe($("#grid:first").children("tbody:first")[0], {childList: true});
+    //*/
+    /*
+    $("#grid").onCreate(".task-row .grid-cell", 
+                        function(elements){
+        elements.forEach(function(row) {
+            observer.observe(row,{
+                attributes: true
+            });
+        });
+    }, multi = true);
+    */
 
     //    var taskName =$(row).find("textarea").val();
+ 
+    
 })();
 
 function displayResult(resultNumber) {

@@ -22,49 +22,47 @@ var runningSum = 0;
 var selectedRows = {};
 function integratedMethodSetup() {
     var task_row = document.querySelectorAll('#grid tr');
-    var observer = new MutationObserver(function(mutations) {
+    var taskObserver = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             if (mutation.attributeName === "class") {
-                var textArea = $(mutation.target).find("textarea");
-                //console.log(textArea.val());
-                var isSelected = mutation.target.classList.contains('grid-row-selected');
-                //console.log("isSelected: ", isSelected);
-                taskNum = getNumberFromTaskName(textArea.val());
-                dictKey = mutation.target.id;
-                if ((dictKey in selectedRows) && !isSelected) {
-                    runningSum -= selectedRows[dictKey];
-                    delete selectedRows[dictKey];
-                } else if (!(dictKey in selectedRows) && isSelected) {
-                    selectedRows[dictKey] = taskNum;
-                    runningSum += taskNum;
-                }
-                //console.log(runningSum);
-                if (Object.keys(selectedRows).length > 1) {
-                    displayResult(runningSum);
-                }
+                processRowEvent(mutation.target);
             }
-        });
-
-
-    });    
-    task_row.forEach(function(row) {
-        observer.observe(row,  {
-            attributes: true
         });
     });
 
+    function observeRow(row) {
+        taskObserver.observe(row, {attributes: true});
+    }
+
+    task_row.forEach(observeRow);
 
     var gridObserver = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
-            mutation.addedNodes.forEach(function (row) {
-                observer.observe(row,  {
-                    attributes: true
-                });
-            });
+            mutation.addedNodes.forEach(observeRow);
         });
     });
 
     gridObserver.observe($("#grid:first").children("tbody:first")[0], {childList: true});
+}
+
+function processRowEvent(row) {
+    var textArea = $(row).find("textarea");
+    //console.log(textArea.val());
+    var isSelected = row.classList.contains('grid-row-selected');
+    //console.log("isSelected: ", isSelected);
+    taskNum = getNumberFromTaskName(textArea.val());
+    dictKey = row.id;
+    if ((dictKey in selectedRows) && !isSelected) {
+        runningSum -= selectedRows[dictKey];
+        delete selectedRows[dictKey];
+    } else if (!(dictKey in selectedRows) && isSelected) {
+        selectedRows[dictKey] = taskNum;
+        runningSum += taskNum;
+    }
+    //console.log(runningSum);
+    if (Object.keys(selectedRows).length > 1) {
+        displayResult(runningSum);
+    }
 }
 
 function displayResult(resultNumber) {
@@ -79,7 +77,6 @@ function displayResult(resultNumber) {
     }
     panelTitle.textContent = currentTitle.substring(0, subStringEnd) +" ["+resultNumber+"]";
 }
-
 
 
 function getNumberFromTaskName(taskName) {
@@ -103,16 +100,10 @@ function getTotalCount(){
     var hours=0;
     $("#grid").find("tr").each(function(i,row){
         var textArea = $(row).find("textarea");
-        var taskName = textArea.val();   
-        if (!$(row).hasClass("grid-row-selected")) {
-            return true;
+        var taskName = textArea.val();
+        if ($(row).hasClass("grid-row-selected")) {
+            hours += getNumberFromTaskName(taskName);
         }
-
-        hours += getNumberFromTaskName(taskName);
     });
     return hours;
 }
-
-
-
-

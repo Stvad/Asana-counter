@@ -83,7 +83,7 @@ function displayResult(resultNumber) {
 
 
 function getNumberFromTaskName(taskName) {
-    var myRegexp = /\[(\d+|\d+\.\d+)\]/g;
+    var myRegexp = /\[((?:-|\+)?(\d+|\d+\.\d+))\]/g;
     try {
         var match = myRegexp.exec(taskName);
         return parseFloat(match[1]);

@@ -38,11 +38,11 @@ var selectedRows = {};
                 if ((dictKey in selectedRows) && !isSelected) {
                     delete selectedRows[dictKey];
                     runningSum -= taskNum;
-                    console.log('removing ' + textArea.id);
+                    //console.log('removing ' + textArea.id);
                 } else if (!(dictKey in selectedRows) && isSelected) {
                     selectedRows[dictKey] = true;
                     runningSum += taskNum;
-                    console.log('adding ' + dictKey);
+                    //console.log('adding ' + dictKey);
                 }
                 console.log(runningSum);
                 if (Object.keys(selectedRows).length > 1) {
@@ -63,12 +63,17 @@ var selectedRows = {};
 })();
 
 function displayResult(resultNumber) {
-    var currentTitle = $(".details-pane-title")[0].children[0].textContent;
+    //console.log($("#right_pane.multi-selected").find(".header-name")[0].textContent);
+    var panelTitle = $("#right_pane.multi-selected").find(".header-name")[0];
+    if (!panelTitle) {
+        return;
+    }
+    var currentTitle = panelTitle.textContent;//$("#right_pane.multi-selected").find(".header-name")[0].textContent; //$(".details-pane-title")[0].children[0].textContent;
     var subStringEnd = currentTitle.indexOf("[");
     if (subStringEnd === -1) {
         subStringEnd = currentTitle.length;
     }
-    $(".details-pane-title")[0].children[0].textContent = currentTitle.substring(0, subStringEnd) +" ["+resultNumber+"]";
+    panelTitle.textContent = currentTitle.substring(0, subStringEnd) +" ["+resultNumber+"]";
 }
 
 /*

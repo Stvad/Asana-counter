@@ -9,6 +9,8 @@
 // @require     https://craig.global.ssl.fastly.net/js/mousetrap/mousetrap.min.js
 // ==/UserScript==
 
+var runningSum = 0;
+var selectedRows = {};
 (function() {
     Mousetrap.bind(['command+k', 'ctrl+k'], function(e) {
         //console.log("whee");
@@ -16,9 +18,59 @@
         alert(getTotalHours());
         return false;
     });
+    
+    Mousetrap.bind(['ctrl+m'], function(e) {
+        alert(runningSum);
+        return false;
+    });
+
+    var task_row = document.querySelectorAll('#grid tr');
+    var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.attributeName === "class") {
+                //console.log("mutation target: ", mutation.target);
+                var textArea = $(mutation.target).find("textarea");
+                console.log(textArea.val());
+                var isSelected = mutation.target.classList.contains('grid-row-selected');
+                console.log("isSelected: ", isSelected);
+                taskNum = getNumberFromTaskName(textArea.val());
+                dictKey = textArea.val();//todo
+                if ((dictKey in selectedRows) && !isSelected) {
+                    delete selectedRows[dictKey];
+                    runningSum -= taskNum;
+                    console.log('removing ' + textArea.id);
+                } else if (!(dictKey in selectedRows) && isSelected) {
+                    selectedRows[dictKey] = true;
+                    runningSum += taskNum;
+                    console.log('adding ' + dictKey);
+                }
+                console.log(runningSum);
+                if (Object.keys(selectedRows).length > 1) {
+                    displayResult(runningSum);
+                }
+            }
+        });
+
+
+    });    
+    task_row.forEach(function(row) {
+        observer.observe(row,  {
+            attributes: true
+        });
+    });
 
     //    var taskName =$(row).find("textarea").val();
 })();
+
+function displayResult(resultNumber) {
+    var currentTitle = $(".details-pane-title")[0].children[0].textContent;
+    var subStringEnd = currentTitle.indexOf("[");
+    if (subStringEnd === -1) {
+        subStringEnd = currentTitle.length;
+    }
+    $(".details-pane-title")[0].children[0].textContent = currentTitle.substring(0, subStringEnd) +" ["+resultNumber+"]";
+}
+
 /*
 window.setInterval(function(){
 
@@ -37,7 +89,17 @@ window.setInterval(function(){
 
 },2000);
 */
-var runningSum = 0;
+
+function getNumberFromTaskName(taskName) {
+    var myRegexp = /\[(\d+|\d+\.\d+)\]/g;
+    try {
+        var match = myRegexp.exec(taskName);
+        //console.log(match[1]);
+        return parseFloat(match[1]);
+    } catch (err) {
+        return 0;
+    }
+}
 
 function getTotalHours(){
     var hours=0;
@@ -49,15 +111,10 @@ function getTotalHours(){
         }
 
         //console.log(taskName);
-        var currentNum = 0;
-        var myRegexp = /\[(\d+|\d+\.\d+)\]/g;
-        try {
-            var match = myRegexp.exec(taskName);
-            //console.log(match[1]);
-            currentNum = parseFloat(match[1]);
-        } catch (err) {}
-        hours += currentNum;
+        
+        hours += getNumberFromTaskName(taskName);
 
+        /*
         textArea.select(function(){
             // does not work as expected on multiselect (asana generates multiple select events for last value?)
             // another problem - new values when you scroll (if you don't add handlers regularly)
@@ -77,17 +134,12 @@ function getTotalHours(){
         textArea.on(getEventsList(textArea), function(e) {
             console.log(e);
         });
+        */
 
     });
     return hours;
 }
 
-function getEventsList($obj) {
-    var ev = new Array(),
-        events = $obj.data('events'),
-        i;
-    for(i in events) { ev.push(i); }
-    return ev.join(' ');
-}
+
 
 

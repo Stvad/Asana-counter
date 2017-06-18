@@ -9,27 +9,28 @@
 // @require     https://craig.global.ssl.fastly.net/js/mousetrap/mousetrap.min.js
 // ==/UserScript==
 
-//todo: weired things might happen if you modify selected items
+//todo: in integrated method if you modify selected item - and then do the estimate without changing selection - changes won't be counted
+
+(function() {
+    legacyMethodSetup();
+
+    integratedMethodSetup();
+})();
+
 
 var runningSum = 0;
 var selectedRows = {};
-(function() {
-    Mousetrap.bind(['command+k', 'ctrl+k'], function(e) {
-        alert(getTotalCount());
-        return false;
-    });
-
-
+function integratedMethodSetup() {
     var task_row = document.querySelectorAll('#grid tr');
     var observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             if (mutation.attributeName === "class") {
                 var textArea = $(mutation.target).find("textarea");
-                console.log(textArea.val());
+                //console.log(textArea.val());
                 var isSelected = mutation.target.classList.contains('grid-row-selected');
-                console.log("isSelected: ", isSelected);
+                //console.log("isSelected: ", isSelected);
                 taskNum = getNumberFromTaskName(textArea.val());
-                dictKey = textArea.val();//todo
+                dictKey = mutation.target.id;
                 if ((dictKey in selectedRows) && !isSelected) {
                     runningSum -= selectedRows[dictKey];
                     delete selectedRows[dictKey];
@@ -37,7 +38,7 @@ var selectedRows = {};
                     selectedRows[dictKey] = taskNum;
                     runningSum += taskNum;
                 }
-                console.log(runningSum);
+                //console.log(runningSum);
                 if (Object.keys(selectedRows).length > 1) {
                     displayResult(runningSum);
                 }
@@ -64,7 +65,7 @@ var selectedRows = {};
     });
 
     gridObserver.observe($("#grid:first").children("tbody:first")[0], {childList: true});
-})();
+}
 
 function displayResult(resultNumber) {
     var panelTitle = $("#right_pane.multi-selected").find(".header-name")[0];
@@ -89,6 +90,13 @@ function getNumberFromTaskName(taskName) {
     } catch (err) {
         return 0;
     }
+}
+
+function legacyMethodSetup() {
+    Mousetrap.bind(['command+k', 'ctrl+k'], function(e) {
+        alert(getTotalCount());
+        return false;
+    });
 }
 
 function getTotalCount(){

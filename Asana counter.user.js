@@ -9,8 +9,6 @@
 // @require     https://craig.global.ssl.fastly.net/js/mousetrap/mousetrap.min.js
 // ==/UserScript==
 
-//todo: in integrated method if you modify selected item - and then do the estimate without changing selection - changes won't be counted
-
 (function() {
     legacyMethodSetup();
 
@@ -21,7 +19,7 @@
 var runningSum = 0;
 var selectedRows = {};
 function integratedMethodSetup() {
-    var task_row = document.querySelectorAll('#grid tr');
+    var task_rows = document.querySelectorAll('#grid tr');
     var taskObserver = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             if (mutation.attributeName === "class") {
@@ -34,7 +32,7 @@ function integratedMethodSetup() {
         taskObserver.observe(row, {attributes: true});
     }
 
-    task_row.forEach(observeRow);
+    task_rows.forEach(observeRow);
 
     var gridObserver = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
@@ -47,19 +45,26 @@ function integratedMethodSetup() {
 
 function processRowEvent(row) {
     var textArea = $(row).find("textarea");
-    //console.log(textArea.val());
-    var isSelected = row.classList.contains('grid-row-selected');
+    // console.log(textArea.val());
+    var isSelected = $(row).hasClass("grid-row-selected");
     //console.log("isSelected: ", isSelected);
     taskNum = getNumberFromTaskName(textArea.val());
     dictKey = row.id;
-    if ((dictKey in selectedRows) && !isSelected) {
-        runningSum -= selectedRows[dictKey];
-        delete selectedRows[dictKey];
+    if (dictKey in selectedRows) {
+        if (isSelected) {
+            var diff = taskNum - selectedRows[dictKey];
+            selectedRows[dictKey] += diff;
+            runningSum += diff;
+        }
+        else {
+            runningSum -= selectedRows[dictKey];
+            delete selectedRows[dictKey];
+        }
     } else if (!(dictKey in selectedRows) && isSelected) {
         selectedRows[dictKey] = taskNum;
         runningSum += taskNum;
     }
-    //console.log(runningSum);
+    // console.log(runningSum);
     if (Object.keys(selectedRows).length > 1) {
         displayResult(runningSum);
     }

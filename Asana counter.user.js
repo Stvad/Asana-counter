@@ -22,14 +22,12 @@ function integratedMethodSetup() {
     var task_rows = document.querySelectorAll('#grid tr');
     var taskObserver = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
-            if (mutation.attributeName === "class") {
-                processRowEvent(mutation.target);
-            }
+            processRowEvent(mutation.target);
         });
     });
 
     function observeRow(row) {
-        taskObserver.observe(row, {attributes: true});
+        taskObserver.observe(row, {attributeFilter: ["class"]});
     }
 
     task_rows.forEach(observeRow);
@@ -52,6 +50,7 @@ function processRowEvent(row) {
     dictKey = row.id;
     if (dictKey in selectedRows) {
         if (isSelected) {
+            // handles the case when we change the value on the task, while it has stayed selected
             var diff = taskNum - selectedRows[dictKey];
             selectedRows[dictKey] += diff;
             runningSum += diff;

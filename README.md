@@ -14,7 +14,6 @@ Reload the Asana;
 
 You're good to go :).
 
-Select some tasks. If they have numbers in square brackets in them - the numbers will be summed up and displayed on the right panel.
 Examples of expected numbers format in tasks:
 
 - task [42]
@@ -22,3 +21,7 @@ Examples of expected numbers format in tasks:
 - task[3.14]
 
 - [-1] task
+
+~~Select some tasks. If they have numbers in square brackets in them - the numbers will be summed up and displayed on the right panel.~~ (note this only works on 'My Tasks' view for now.)
+
+**Alternative approach:** select the tasks, press "Ctrl+k" - the alert with the sum will be displayed. 

@@ -94,7 +94,7 @@ function getNumberFromTaskName(taskName) {
 }
 
 function legacyMethodSetup() {
-    Mousetrap.bind(['command+k', 'ctrl+k'], function(e) {
+    Mousetrap(document.body).bind(['command+k', 'ctrl+k'], function(e) {
         alert(getTotalCount());
         return false;
     });

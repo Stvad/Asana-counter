@@ -102,12 +102,17 @@ function legacyMethodSetup() {
 
 function getTotalCount(){
     var hours=0;
-    $("#grid").find("tr").each(function(i,row){
-        var textArea = $(row).find("textarea");
-        var taskName = textArea.val();
-        if ($(row).hasClass("grid-row-selected")) {
-            hours += getNumberFromTaskName(taskName);
-        }
+    $(".TaskList").find(".itemRow").add(
+        $("#grid").find("tr")).each(function (i, row) {
+        hours += getNumberFromRow(row);
     });
+
     return hours;
+}
+
+function getNumberFromRow(row) {
+    if ($(row).is(".grid-row-selected,.itemRow--highlighted,.itemRow--focused")) {
+        return getNumberFromTaskName($(row).find("textarea").val());
+    }
+    return 0;
 }

@@ -124,8 +124,7 @@ function legacyMethodSetup() {
 
 function getTotalCount(){
     var hours=0;
-    $(".TaskList").find(".itemRow").add(
-        $("#grid").find("tr")).each(function (i, row) {
+    $(".TaskList .itemRow, #grid tr").each(function (i, row) {
         hours += getNumberFromRow(row);
     });
 

@@ -8,6 +8,7 @@
 // @run-at      document-idle
 // @require     https://code.jquery.com/jquery-3.2.1.min.js
 // @require     https://craig.global.ssl.fastly.net/js/mousetrap/mousetrap.min.js
+// @require     https://raw.githubusercontent.com/uzairfarooq/arrive/master/minified/arrive.min.js
 // ==/UserScript==
 
 var runningSum = 0;
@@ -21,7 +22,7 @@ var selectedRows = {};
 })();
 
 function integratedMethodSetup() {
-    var task_rows = document.querySelectorAll('#grid tr,.TaskList .itemRow');
+    var task_rows = document.querySelectorAll("#grid tr,.TaskList .itemRow");
     console.log(task_rows);
     var taskObserver = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
@@ -30,40 +31,61 @@ function integratedMethodSetup() {
     });
 
     function observeRow(row) {
-        taskObserver.observe(row, {attributeFilter: ["class"]});
+        //this contraption needed to accomodate 2 types of rows that we can receive
+        //tr and .itemRow
+        taskObserver.observe($(row).find(".itemRow").addBack()[0], {attributeFilter: ["class"]});
     }
 
     task_rows.forEach(observeRow);
 
-    var gridObserver = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            mutation.addedNodes.forEach(observeRow);
-        });
+    // var gridObserver = new MutationObserver(function(mutations) {
+    //     mutations.forEach(function(mutation) {
+    //         mutation.addedNodes.forEach(observeRow);
+    //     });
+    // });
+    //
+    // // gridObserver.observe($("#grid:first tbody,.TaskList")[0], {childList: true});
+    //
+    //
+    // //id center_pane__contents
+    // //class column-contents-on-click-below-content
+    // var centerContentObserver = new MutationObserver(function (mutations) {
+    //     mutations.forEach(function (mutation) {
+    //         console.log($(mutation.target));
+    //         console.log($(mutation.target).find("#grid tbody,.TaskList"));
+    //         var tableSelector = $(mutation.target).find("#grid tbody,.TaskList");
+    //         var grid = $(mutation.target).find("#grid tbody,.TaskList")[0];
+    //         console.log(grid);
+    //         if (!tableSelector.length) {
+    //             return;
+    //         }
+    //         gridObserver.observe(grid, {childList: true});
+    //         rows = grid.querySelectorAll("tr,.itemRow");
+    //         rows.forEach(observeRow);
+    //
+    //         runningSum = 0;
+    //         selectedRows = {};
+    //
+    //     });
+    // });
+    //
+    // centerContentObserver.observe($("#center_pane__contents:first .column-contents-on-click-below-content")[0],
+    //     {childList: true});
+
+    // var centerContentVerboseObserver = new MutationObserver(function (mutations) {
+    //     mutations.forEach(function (mutation) {
+    //         console.log(mutation.target);
+    //     });
+    // });
+    //
+    // centerContentVerboseObserver.observe($("#center_pane__contents:first .column-contents-on-click-below-content")[0],
+    //     {attributeFilter: ["class"], subtree: true, attributes: true});
+
+    $("#center_pane__contents:first .column-contents-on-click-below-content").
+    arrive("#grid tr,.TaskList .itemRow", function (newElement) {
+        console.log(newElement);
     });
 
-    gridObserver.observe($("#grid:first tbody")[0], {childList: true});
-
-
-    //id center_pane__contents
-    //class column-contents-on-click-below-content
-    var centerContentObserver = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-            // console.log($(mutation.target));
-            // console.log($(mutation.target).find("#grid"));
-            var grid = $(mutation.target).find("#grid")[0];
-            console.log(grid);
-            gridObserver.observe(grid, {childList: true});
-            rows = grid.querySelectorAll("tr");
-            rows.forEach(observeRow);
-
-            runningSum = 0;
-            selectedRows = {};
-
-        });
-    });
-
-    centerContentObserver.observe($("#center_pane__contents:first").children(".column-contents-on-click-below-content")[0],
-        {childList: true});
 }
 
 function processRowEvent(row) {

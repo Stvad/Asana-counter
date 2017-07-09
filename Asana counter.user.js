@@ -39,6 +39,28 @@ function integratedMethodSetup() {
     });
 
     gridObserver.observe($("#grid:first").children("tbody:first")[0], {childList: true});
+
+
+    //id center_pane__contents
+    //class column-contents-on-click-below-content
+    var centerContentObserver = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+            // console.log($(mutation.target));
+            // console.log($(mutation.target).find("#grid"));
+            var grid = $(mutation.target).find("#grid")[0];
+            console.log(grid);
+            gridObserver.observe(grid, {childList: true});
+            rows = grid.querySelectorAll("tr");
+            rows.forEach(observeRow);
+
+            runningSum = 0;
+            selectedRows = {};
+
+        });
+    });
+
+    centerContentObserver.observe($("#center_pane__contents:first").children(".column-contents-on-click-below-content")[0],
+        {childList: true});
 }
 
 function processRowEvent(row) {

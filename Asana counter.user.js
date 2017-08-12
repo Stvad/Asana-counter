@@ -35,12 +35,21 @@ function integratedMethodSetup() {
 
     task_rows.forEach(observeRow);
 
-    $("#center_pane__contents:first .column-contents-on-click-below-content").
+    central_pane_selector = "#center_pane__contents:first .column-contents-on-click-below-content"
+
+    $(central_pane_selector).
     arrive("#grid tr,.TaskList .ItemRow", function (newElement) {
         observeRow(newElement);
     });
 
-    $("#center_pane__contents:first .column-contents-on-click-below-content").
+    // For some reason this change is not detected in another observer. This one handles case when the task
+    // gets completed
+    $(central_pane_selector + " #grid").
+    leave("tr", function (removedElement) {
+        processRowEvent(removedElement);
+    });
+
+    $(central_pane_selector).
     arrive("#grid,.TaskList", function (newElement) {
         // When change project/view - deselection is not happening, so we need to cleanup ourselves.
         runningSum = 0;

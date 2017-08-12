@@ -21,7 +21,7 @@ var selectedRows = {};
 })();
 
 function integratedMethodSetup() {
-    var task_rows = document.querySelectorAll("#grid tr,.TaskList .itemRow");
+    var task_rows = document.querySelectorAll("#grid tr,.TaskList .ItemRow");
     var taskObserver = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             processRowEvent(mutation.target);
@@ -29,14 +29,14 @@ function integratedMethodSetup() {
     });
 
     function observeRow(row) {
-        //this contraption needed to accomodate 2 types of rows that we can receive //tr and .itemRow
-        taskObserver.observe($(row).find(".itemRow").addBack()[0], {attributeFilter: ["class"]});
+        //this contraption needed to accomodate 2 types of rows that we can receive //tr and .ItemRow
+        taskObserver.observe($(row).find(".ItemRow").addBack()[0], {attributeFilter: ["class"]});
     }
 
     task_rows.forEach(observeRow);
 
     $("#center_pane__contents:first .column-contents-on-click-below-content").
-    arrive("#grid tr,.TaskList .itemRow", function (newElement) {
+    arrive("#grid tr,.TaskList .ItemRow", function (newElement) {
         observeRow(newElement);
     });
 
@@ -52,7 +52,7 @@ function integratedMethodSetup() {
 function processRowEvent(row) {
     var textArea = $(row).find("textarea");
     // console.log(textArea.val());
-    var isSelected = $(row).is(".grid-row-selected,.itemRow--highlighted,.itemRow--focused");
+    var isSelected = $(row).is(".grid-row-selected,.ItemRow--highlighted,.ItemRow--focused");
     // console.log("isSelected: ", isSelected);
     taskNum = getNumberFromTaskName(textArea.val());
     dictKey = textArea[0].id;
@@ -110,7 +110,7 @@ function legacyMethodSetup() {
 
 function getTotalCount(){
     var hours=0;
-    $(".TaskList .itemRow, #grid tr").each(function (i, row) {
+    $(".TaskList .ItemRow, #grid tr").each(function (i, row) {
         hours += getNumberFromRow(row);
     });
 
@@ -118,7 +118,7 @@ function getTotalCount(){
 }
 
 function getNumberFromRow(row) {
-    if ($(row).is(".grid-row-selected,.itemRow--highlighted,.itemRow--focused")) {
+    if ($(row).is(".grid-row-selected,.ItemRow--highlighted,.ItemRow--focused")) {
         return getNumberFromTaskName($(row).find("textarea").val());
     }
     return 0;

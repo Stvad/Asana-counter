@@ -25,4 +25,4 @@ Examples of expected numbers format in tasks:
 
 **First approach:** Select some tasks. If they have numbers in square brackets in them - the numbers will be summed up and displayed on the right panel.
 
-**Alternative approach:** select the tasks, press "Ctrl+k" - the alert with the sum will be displayed. 
+**Alternative approach:** select the tasks, press "Ctrl+k" - the alert with the sum will be displayed (it also will be printed to console.log).

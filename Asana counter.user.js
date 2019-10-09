@@ -127,7 +127,7 @@ function getTotalCount() {
     // legacy view
     $(".TaskList .ItemRow, #grid tr").each(function (i, row) {
         hours += getNumberFromRow(row);
-    }
+    });
     // spreadsheet view
     $(".SpreadsheetGridScroller-container .SpreadsheetRow").each(function (i, row) {
         hours += getNumberFromRow(row);

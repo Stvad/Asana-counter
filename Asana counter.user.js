@@ -124,7 +124,12 @@ function legacyMethodSetup() {
 
 function getTotalCount() {
     let hours = 0;
+    // legacy view
     $(".TaskList .ItemRow, #grid tr").each(function (i, row) {
+        hours += getNumberFromRow(row);
+    });
+    // spreadsheet view
+    $(".SpreadsheetGridScroller-container .SpreadsheetRow").each(function (i, row) {
         hours += getNumberFromRow(row);
     });
 
@@ -132,7 +137,8 @@ function getTotalCount() {
 }
 
 function getNumberFromRow(row) {
-    if ($(row).is(".grid-row-selected,.ItemRow--highlighted,.ItemRow--focused")) {
+    if ($(row).is(".grid-row-selected,.ItemRow--highlighted,.ItemRow--focused")
+        || $(row).is(".SpreadsheetRow--highlighted,.SpreadsheetTaskRow--focused")) {
         return getNumberFromTaskName($(row).find("textarea").val());
     }
     return 0;
